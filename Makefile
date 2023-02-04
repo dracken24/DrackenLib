@@ -6,7 +6,7 @@
 #    By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/23 13:22:35 by nadesjar          #+#    #+#              #
-#    Updated: 2023/02/03 15:55:02 by dracken24        ###   ########.fr        #
+#    Updated: 2023/02/04 18:03:58 by dracken24        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ P_CLASS			= ./srcs/class/
 
 FILES			= $(P_SRCS)main.cpp \
 				$(P_CLASS)_ProgramGestion.cpp \
+				$(P_CLASS)_PublicFunctions.cpp \
 
 OBJS			= $(patsubst $(P_SRCS)%.cpp, $(P_OBJS)%.o, $(FILES))
 
@@ -48,7 +49,7 @@ $(P_OBJS)%.o:	$(P_SRCS)%.cpp
 # --------------------------------- Execute ---------------------------------- #
 
 execute:
-	@./$(NAME)
+	@./$(NAME) ./meshs/test.obj ./textures/viking_room.png
 
 # ----------------------------------- Git ------------------------------------ #
 

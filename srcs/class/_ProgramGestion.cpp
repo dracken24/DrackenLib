@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:20:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/03 20:35:33 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/04 18:09:14 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,13 @@
 #include <tiny_obj_loader.h>
 
 #include "../../includes/class/_ProgramGestion.hpp"
-#include "../../includes/engine.hpp"
+// #include "../../includes/engine.hpp"
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL	debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData);
 
 int		keyPress(GLFWwindow *window);
 float	deltaTime(void);
-
 
 extern ProgramGestion app;
 
@@ -156,7 +155,7 @@ void ProgramGestion::cleanup()
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
-	std::cout << GREEN << "Vulkan resources cleaned up, success" << RESET << std::endl;
+	std::cout << GREEN << '\n' <<  "Vulkan resources cleaned up, success" << RESET << std::endl << std::endl;
 }
 
 //******************************************************************************************************//
@@ -259,6 +258,25 @@ float	ProgramGestion::deltaTime(void)
 	lastFrame = currentFrame;
 	
 	return (deltaTime);
+}
+
+ProgramGestion::Vector2	ProgramGestion::getImgSize(const char *path)
+{
+    int width;
+    int height;
+    int channels;
+    unsigned char *data = stbi_load(path, &width, &height, &channels, 0);
+    
+    if (data)
+    {
+        stbi_image_free(data);
+        return (Vector2{static_cast<float>(width), static_cast<float>(height)});
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+        return (Vector2{0, 0});
+    }
 }
 
 //******************************************************************************************************//
@@ -1096,7 +1114,7 @@ VkShaderModule ProgramGestion::createShaderModule(const std::vector<char> &code)
 }
 
 // Read a file and return a vector of char //
-static std::vector<char> readFile(const std::string &filename)
+std::vector<char> ProgramGestion::readFile(const std::string &filename)
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
@@ -1645,18 +1663,23 @@ void ProgramGestion::createUniformBuffers()
 	}
 }
 
-// Update the uniform buffer //
 void ProgramGestion::updateUniformBuffer(uint32_t currentImage)
 {
 	// Update the uniform buffer //
 	UniformBufferObject ubo{};
-	//                                                     / Rotate Speed /
-	ubo.model = glm::rotate(glm::mat4(0.20f), (_deltaTime * _FPS) * glm::radians(0.5f), glm::vec3(0.0f, 0.0f, 1.0f));						// Rotate the model //
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));			// Camera position //
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);	// Perspective projection //
-	ubo.proj[1][1] *= -1;																									// Flip the Y axis //
+	ubo.model = glm::rotate(glm::mat4(0.20f), glm::radians(_rotate.z), glm::vec3(1.0f, 0.0f, 0.0f));
+	ubo.model = glm::rotate(ubo.model, glm::radians(_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	ubo.model = glm::rotate(ubo.model, glm::radians(_rotate.x), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));															// Copy the data to the uniform buffer //
+	
+	ubo.model = glm::translate(ubo.model, glm::vec3(_translate.x, _translate.y, _translate.z));
+	ubo.model = glm::scale(ubo.model, glm::vec3(_scale.x, _scale.y, _scale.z));
+	
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+	ubo.proj[1][1] *= -1;
+
+	memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
 
 // Create the descriptor pool //

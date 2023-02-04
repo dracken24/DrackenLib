@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 21:53:06 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/03 20:33:31 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/04 18:06:14 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 #include <glm/gtx/hash.hpp>
 
 #include "../color.hpp"
+// #include "../engine.hpp"
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -60,9 +61,6 @@
 
 #define WIDTH 1500
 #define HEIGHT 920
-
-const std::string MODEL_PATH = "meshs/test.obj";
-const std::string TEXTURE_PATH = "meshs/viking_room.png";
 
 // Validation layers //
 const std::vector<const char*> validationLayers = {
@@ -164,47 +162,69 @@ class ProgramGestion
 	//******************************************************************************************************//
 	//												Structs										    		//
 	//******************************************************************************************************//
-
-	// Queue family indices //
-	struct QueueFamilyIndices
-	{
-		std::optional<uint32_t>		graphicsFamily;
-		std::optional<uint32_t>		presentFamily;
-		
-		bool isComplete()
+	public:
+		typedef struct  Vector3
 		{
-			return graphicsFamily.has_value() && presentFamily.has_value();
-		}
-	};
+			float	x;
+			float	y;
+			float	z;
+		}               Vector3;
 
-	// Swap chain support details //
-	struct SwapChainSupportDetails
-	{
-		VkSurfaceCapabilitiesKHR capabilities;
-		std::vector<VkSurfaceFormatKHR> formats;
-		std::vector<VkPresentModeKHR> presentModes;
-	};
+		typedef struct  Vector2
+		{
+			float	x;
+			float	y;
+		}               Vector2;
 
-	// Uniform buffer square object contnant 2 triangles //
-	std::vector<Vertex> vertices;
+		typedef struct  Texture2D
+		{
+			std::string		objPath;
+			std::string		objName;
 
-	// const std::vector<Vertex> vertices = {
-	// 	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-	// 	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-	// 	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-	// 	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+			std::string		imgPath;
+			std::string		imgName;
+			Vector2			imgSize;
 
-	// 	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-	// 	{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-	// 	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-	// 	{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-	// };
+			std::string		imgType;
+		}               Texture2D;
+
+		typedef struct		Rotate
+		{
+			Vector3        axis;
+			float           angle;
+		}					Rotate;
+
+		// Queue family indices //
+		struct QueueFamilyIndices
+		{
+			std::optional<uint32_t>		graphicsFamily;
+			std::optional<uint32_t>		presentFamily;
+			
+			bool isComplete()
+			{
+				return graphicsFamily.has_value() && presentFamily.has_value();
+			}
+		};
+
+		// Swap chain support details //
+		struct SwapChainSupportDetails
+		{
+			VkSurfaceCapabilitiesKHR capabilities;
+			std::vector<VkSurfaceFormatKHR> formats;
+			std::vector<VkPresentModeKHR> presentModes;
+		};
+
+		// Uniform buffer square object contnant 2 triangles //
+		std::vector<Vertex> vertices;
 
 	//******************************************************************************************************//
 	//												Functions									    		//
 	//******************************************************************************************************//
 
-	// Constructor - Destructor //
+	//******************************************************************************************************//
+	//										Constructor - Destructor							    		//
+	//******************************************************************************************************//
+
 	public:
 		ProgramGestion();
 		ProgramGestion(const ProgramGestion &src);
@@ -213,6 +233,8 @@ class ProgramGestion
 		ProgramGestion	&operator=(const ProgramGestion &src);
 	
 	//******************************************************************************************************//
+	//											Public Methods									    		//
+	//******************************************************************************************************//
 
 	// Public Methods //
 	public:
@@ -220,19 +242,28 @@ class ProgramGestion
 		void		drawFrame();
 		void		useFPS(void);
 		void		setFPS(int fps);
-		
+	
 		void		cleanup();
+
+	// Draw //
+		void		putPixel(int x, int y, int color);
 
 	// Setters//
 		void		setDeltaTime(float deltaTime, int flag);
 
 	// Getters//
-		float		getDeltaTime() const;
-		
+		float			getDeltaTime() const;
+
+	// Others //
+		Vector2		getImgSize(const char *path);
+
+	// Init //
+		void		initVariables(int argc, char **argv);
 
 	//******************************************************************************************************//
+	//											Private Methods									    		//
+	//******************************************************************************************************//
 
-	// Private Methods //
 	private:
 		void	initWindow(std::string name);
 		void	initVulkan();
@@ -240,7 +271,9 @@ class ProgramGestion
 		// void	cleanup();
 
 	//******************************************************************************************************//
-	// GPU //
+	//													GPU										    		//
+	//******************************************************************************************************//
+
 		void	createLogicalDevice();
 		void	pickPhysicalDevice(); //- Find Graphic card -//
 		int 	chooseGPU(std::multimap<int, VkPhysicalDevice> devices);
@@ -251,7 +284,9 @@ class ProgramGestion
 		int		rateDeviceSuitability(VkPhysicalDevice device);
 
 	//******************************************************************************************************//
-	// Queue //
+	//												Queue										    		//
+	//******************************************************************************************************//
+
 		VkPresentModeKHR			chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 		VkSurfaceFormatKHR 			chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		VkExtent2D					chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
@@ -265,11 +300,15 @@ class ProgramGestion
 		void	createImageViews();
 
 	//******************************************************************************************************//
-	// Surface //
+	//												Surface										    		//
+	//******************************************************************************************************//
+	
 		void	createSurface();
 
 	//******************************************************************************************************//
-	// Instance creation and debug messages //
+	//									Instance creation and debug messages						    	//
+	//******************************************************************************************************//
+
 		void	createInstance();
 		bool	checkValidationLayerSupport();
 		void	setupDebugMessenger();
@@ -285,7 +324,8 @@ class ProgramGestion
 		void		populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 	
 	//******************************************************************************************************//
-	// Pipeline functions //
+	//											Pipeline functions								    		//
+	//******************************************************************************************************//
 
 		VkShaderModule	createShaderModule(const std::vector<char> &code);
 		void			createGraphicsPipeline();
@@ -293,7 +333,9 @@ class ProgramGestion
 		void			createFramebuffers();
 
 	//******************************************************************************************************//
-	// Command pool and buffer //
+	//										Command pool and buffer								    		//
+	//******************************************************************************************************//
+
 		void	recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void	createCommandBuffers();
 		void	createCommandPool();
@@ -308,13 +350,17 @@ class ProgramGestion
 		}
 	
 	//******************************************************************************************************//
-	// Vertex buffer //
+	//											Vertex buffer									    		//
+	//******************************************************************************************************//
+
 		void		createVertexBuffer();
 		uint32_t	findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 		void		copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 		void		createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
 						VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 		
+	//******************************************************************************************************//
+	//											Index buffer								    		//
 	//******************************************************************************************************//
 	// Index buffer //
 		void		createIndexBuffer();
@@ -327,7 +373,9 @@ class ProgramGestion
 		void		createDescriptorSets();
 		
 	//******************************************************************************************************//
-	// Texture mapping //
+	//											Texture mapping									    		//
+	//******************************************************************************************************//
+
 		void			createImage(uint32_t width, uint32_t height, uint32_t mipLevels,
 							VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling,
 								VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
@@ -345,47 +393,84 @@ class ProgramGestion
 		void			createTextureSampler();
 
 	//******************************************************************************************************//
-	// Depth buffer //
+	//											Depth buffer									    		//
+	//******************************************************************************************************//
+
 		void		createDepthResources();
 		VkFormat	findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
 						VkFormatFeatureFlags features);
 		VkFormat	findDepthFormat();
 		bool		hasStencilComponent(VkFormat format);
 		
-
 	//******************************************************************************************************//
-	// Events //
-		// void		key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-		// int			keyPress(GLFWwindow *window);
-
+	//												Model										    		//
 	//******************************************************************************************************//
-	// Model //	
+
 		void		loadModel();
 
 	//******************************************************************************************************//
-	// Minimaps //	
+	//												Minimaps									    		//
+	//******************************************************************************************************//
+	
 		void		generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth,
 						int32_t texHeight, uint32_t mipLevels);
 
 	//******************************************************************************************************//
-	// Multisampling //	
+	//											Multisampling									    		//
+	//******************************************************************************************************//
+
 		VkSampleCountFlagBits	getMaxUsableSampleCount();
 		void					createColorResources();
 		
 	//******************************************************************************************************//
-	// Others //
+	//												Others										    		//
+	//******************************************************************************************************//
+
+		std::vector<char> readFile(const std::string &filename);
 		float		deltaTime(void);
 	
 	//******************************************************************************************************//
 	//												Variables									    		//
 	//******************************************************************************************************//
 
-	// Private Attributes //
+	// Public Attributes //
 	public:
 		bool							_quit = true;	
 		float							_FPS = 60;
+		float							_zoom = 45.0f;
+		Vector3							_translate = {0.0f, 0.0f, 0.0f};
+		Vector3							_scale = {1.0f, 1.0f, 1.0f};
+
 		GLFWwindow						*window;	//- Stock window -//
+		
+		Vector3							_rotate = {0.0f, 0.0f, 0.0f};
+		uint							_w = 0;
+		uint							_a = 0;
+		uint							_s = 0;
+		uint							_d = 0;
+		uint							_e = 0;
+		uint							_q = 0;
+		
+		uint							_up = 0;
+		uint							_down = 0;
+		uint							_left = 0;
+		uint							_right = 0;
+
+		uint							_mouseLeft = 0;
+		uint							_mouseRight = 0;
+		uint							_mouseMiddle = 0;
+		
+		uint							_space = 0;
+
+		std::string MODEL_PATH;
+		std::string TEXTURE_PATH;
+
+		std::string MODEL_PATH_DROP;
+		std::string TEXTURE_PATH_DROP;
+
+		std::vector<Texture2D> _objs;
 	
+	// Private Attributes //
 	private:
 		VkInstance						instance;	//- Stock instance -//
 		uint							widith = WIDTH;
@@ -456,5 +541,14 @@ class ProgramGestion
 		
 		float							_deltaTime = 0.0f;
 };
+
+void	key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void	mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void	scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void	drop_callback(GLFWwindow* window, int count, const char** paths);
+void	resetTransform(void);
+void	onKeyPress(void);
+
+int		keyPress(GLFWwindow *window);
 
 #endif
