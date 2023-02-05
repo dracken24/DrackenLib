@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 21:53:06 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/04 18:06:14 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/04 22:28:45 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,9 +178,6 @@ class ProgramGestion
 
 		typedef struct  Texture2D
 		{
-			std::string		objPath;
-			std::string		objName;
-
 			std::string		imgPath;
 			std::string		imgName;
 			Vector2			imgSize;
@@ -188,10 +185,22 @@ class ProgramGestion
 			std::string		imgType;
 		}               Texture2D;
 
+		typedef struct  Obj
+		{
+			std::string		objPath;
+			std::string		objName;
+		}               Obj;
+		
+		// typedef struct  TextObjs
+		// {
+		// 	Texture2D	texture;
+		// 	Obj			obj;
+		// }               TextObjs;
+
 		typedef struct		Rotate
 		{
 			Vector3        axis;
-			float           angle;
+			float          angle;
 		}					Rotate;
 
 		// Queue family indices //
@@ -440,6 +449,7 @@ class ProgramGestion
 		float							_zoom = 45.0f;
 		Vector3							_translate = {0.0f, 0.0f, 0.0f};
 		Vector3							_scale = {1.0f, 1.0f, 1.0f};
+		Vector2							_mousePos = {0.0f, 0.0f};
 
 		GLFWwindow						*window;	//- Stock window -//
 		
@@ -468,7 +478,8 @@ class ProgramGestion
 		std::string MODEL_PATH_DROP;
 		std::string TEXTURE_PATH_DROP;
 
-		std::vector<Texture2D> _objs;
+		std::vector<Texture2D>	_textures;
+		std::vector<Obj> 		_obj;
 	
 	// Private Attributes //
 	private:
@@ -549,6 +560,6 @@ void	drop_callback(GLFWwindow* window, int count, const char** paths);
 void	resetTransform(void);
 void	onKeyPress(void);
 
-int		keyPress(GLFWwindow *window);
+int		events(GLFWwindow *window);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:14:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/04 18:08:14 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/04 22:28:57 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,8 @@ void mainLoop()
 	{
 		glfwPollEvents();
 
-		keyPress(app.window);
+		events(app.window);
 		onKeyPress();
-
-        GLFWdropfun drop = glfwSetDropCallback(app.window, drop_callback);
 		
 		app.drawFrame();
         

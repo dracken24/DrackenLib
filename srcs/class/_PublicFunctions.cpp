@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/04 17:55:55 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/04 18:11:43 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/04 22:28:38 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,19 +75,19 @@ void	onKeyPress(void)
 
 	// Translate //
 	if (app._up == 1)
-		app._translate.z += 0.1f;
+		app._translate.z += 0.025f;
 	if (app._down == 1)
-		app._translate.z -= 0.1f;
+		app._translate.z -= 0.025f;
 		
 	if (app._left == 1)
 	{
-		app._translate.x += 0.1f;
-		app._translate.y -= 0.1f;
+		app._translate.x += 0.025f;
+		app._translate.y -= 0.025f;
 	}
 	if (app._right == 1)
 	{
-		app._translate.x -= 0.1f;
-		app._translate.y += 0.1f;
+		app._translate.x -= 0.025f;
+		app._translate.y += 0.025f;
 	}
 
 	// Reset //
@@ -233,63 +233,88 @@ void	scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	}
 }
 
-int	keyPress(GLFWwindow *window)
+// Find position of the mouse on screen //
+void	cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	// std::cout << "Cursor x: " << xpos << std::endl;
+	// std::cout << "Cursor y: " << ypos << std::endl;
+	
+	app._mousePos.x = static_cast<float>(xpos);
+	app._mousePos.y = static_cast<float>(ypos);
+}
+
+int	events(GLFWwindow *window)
 {
 	glfwSetKeyCallback(window, key_callback);	                // Key Hook //
 	glfwSetMouseButtonCallback(window, mouse_button_callback);	// Mouse Hook //;
 	glfwSetScrollCallback(window, scroll_callback);	            // Scroll Hook //;
+	glfwSetCursorPosCallback(window, cursor_position_callback);	// Cursor Hook //;
+	glfwSetDropCallback(app.window, drop_callback);
 	
 	return (0);
 }
 
 void	drop_callback(GLFWwindow* window, int count, const char** paths)
 {
-    ProgramGestion::Texture2D   texture;
-    
-    std::cout << "Dropped " << count << std::endl;
-    for (int i = 0; i < count; i++)
+	ProgramGestion::Texture2D   texture;
+	ProgramGestion::Obj   		obj;
+
+    // std::cout << "Dropped " << count << std::endl;
+    for (int it = 0; it < count; it++)
     {
-        // std::cout << "Dropped file: " << paths[i] << std::endl;
-        if (strrchr(paths[i], '.') != NULL)
+		// std::cout << "Path: " << paths[it] << std::endl;
+        if (strrchr(paths[it], '.') != NULL)
         {
-            if (strcmp(strrchr(paths[i], '.'), ".obj") == 0)
+            if (strcmp(strrchr(paths[it], '.'), ".obj") == 0)
             {
-                texture.objPath = paths[i];
-                texture.objName = strrchr(paths[i], '/');
+                obj.objPath = paths[it];
+                obj.objName = strrchr(paths[it], '/');
             }
-            else if (strcmp(strrchr(paths[i], '.'), ".png") == 0)
+            else if (strcmp(strrchr(paths[it], '.'), ".png") == 0 || strcmp(strrchr(paths[it], '.'), ".jpg") == 0)
             {
-                texture.imgPath = paths[i];
-                texture.imgName = strrchr(paths[i], '/');
-                texture.imgType = "png";
-                texture.imgSize = app.getImgSize(paths[i]);
+                texture.imgPath = paths[it];
+                texture.imgName = strrchr(paths[it], '/');
+				if (strcmp(strrchr(paths[it], '.'), ".png") == 0)
+                	texture.imgType = "png";
+				else if (strcmp(strrchr(paths[it], '.'), ".jpg") == 0)
+					texture.imgType = "jpg";
+                texture.imgSize = app.getImgSize(paths[it]);
             }
-            else if (strcmp(strrchr(paths[i], '.'), ".jpg") == 0)
-            {
-                texture.imgPath = paths[i];
-                texture.imgName = strrchr(paths[i], '/');
-                texture.imgType = "jpg";
-                texture.imgSize = app.getImgSize(paths[i]);
-            }
-            if (texture.objPath != "" && texture.imgPath != "")
-            {
-                app._objs.push_back(texture);
-            }
+			
+			if (texture.imgPath != "")
+			{
+				app._textures.push_back(texture);
+				texture.imgPath = "";
+			}
+			else if (obj.objPath != "")
+			{
+				app._obj.push_back(obj);
+				obj.objPath = "";
+			}
         }
         else
             std::cout << "Error: File type not supported" << std::endl;
     }
-    if (app._objs.size() > 0)
-    {
-        for (int i = 0; i < app._objs.size(); i++)
-        {
-            std::cout << "\nDropped Obj Name  : " << app._objs[i].objName << std::endl;
-            std::cout << "Dropped Obj Path  : " << app._objs[i].objPath << std::endl;
-            std::cout << "Dropped Img Name  : " << app._objs[i].imgName << std::endl;
-            std::cout << "Dropped Img Path  : " << app._objs[i].imgPath << std::endl;
-            std::cout << "Dropped Img Type  : " << app._objs[i].imgType << std::endl;
-            std::cout << "Dropped Img Width : " << app._objs[i].imgSize.x << std::endl;
-            std::cout << "Dropped Img Height: " << app._objs[i].imgSize.y << std::endl << std::endl;
-        }
-    }
+	
+	if (app._obj.size() > 0)
+	{
+		for (int k = 0; k < app._obj.size(); k++)
+		{
+			std::cout << YELLOW << "\nDropped Obj Name  [" << k << "]  : " << app._obj[k].objName << std::endl;
+			std::cout << "Dropped Obj Path  [" << k << "]  : " << app._obj[k].objPath << std::endl << std::endl;
+		}
+		std::cout << "-----------------------------------------------------------------" << std::endl;
+	}
+	if (app._textures.size() > 0)
+	{
+		for (int k = 0; k < app._textures.size(); k++)
+		{
+			std::cout << YELLOW << "\nDropped Img Name  [" << k << "]  : " << app._textures[k].imgName << std::endl;
+			std::cout << "Dropped Img Path  [" << k << "]  : " << app._textures[k].imgPath << std::endl;
+			std::cout << "Dropped Img Type  [" << k << "]  : " << app._textures[k].imgType << std::endl;
+			std::cout << "Dropped Img Width [" << k << "]  : " << app._textures[k].imgSize.x << std::endl;
+			std::cout << "Dropped Img Height[" << k << "]  : " << app._textures[k].imgSize.y << RESET << std::endl << std::endl;
+		}
+		std::cout << "-----------------------------------------------------------------" << std::endl;
+	}
 }

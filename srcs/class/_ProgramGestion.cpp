@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:20:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/04 18:09:14 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/04 22:29:25 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,7 +217,7 @@ void ProgramGestion::mainLoop()
 	{
 		glfwPollEvents();
 
-		keyPress(window);
+		events(window);
 		
 		drawFrame();
 		
