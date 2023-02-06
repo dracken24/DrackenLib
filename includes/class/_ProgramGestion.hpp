@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 21:53:06 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/04 22:28:45 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/05 21:52:16 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,40 @@ struct UniformBufferObject
 	alignas(16)glm::mat4 proj;
 };
 
+typedef struct  Vector3
+{
+	float	x;
+	float	y;
+	float	z;
+}               Vector3;
+
+typedef struct  Vector2
+{
+	float	x;
+	float	y;
+}               Vector2;
+
+typedef struct  Texture2D
+{
+	std::string		imgPath;
+	std::string		imgName;
+	Vector2			imgSize;
+
+	std::string		imgType;
+}               Texture2D;
+
+typedef struct  Obj
+{
+	std::string		objPath;
+	std::string		objName;
+}               Obj;
+
+typedef struct		Rotate
+{
+	Vector3        axis;
+	float          angle;
+}					Rotate;
+
 //******************************************************************************************************//
 
 class ProgramGestion
@@ -163,45 +197,6 @@ class ProgramGestion
 	//												Structs										    		//
 	//******************************************************************************************************//
 	public:
-		typedef struct  Vector3
-		{
-			float	x;
-			float	y;
-			float	z;
-		}               Vector3;
-
-		typedef struct  Vector2
-		{
-			float	x;
-			float	y;
-		}               Vector2;
-
-		typedef struct  Texture2D
-		{
-			std::string		imgPath;
-			std::string		imgName;
-			Vector2			imgSize;
-
-			std::string		imgType;
-		}               Texture2D;
-
-		typedef struct  Obj
-		{
-			std::string		objPath;
-			std::string		objName;
-		}               Obj;
-		
-		// typedef struct  TextObjs
-		// {
-		// 	Texture2D	texture;
-		// 	Obj			obj;
-		// }               TextObjs;
-
-		typedef struct		Rotate
-		{
-			Vector3        axis;
-			float          angle;
-		}					Rotate;
 
 		// Queue family indices //
 		struct QueueFamilyIndices
@@ -392,7 +387,7 @@ class ProgramGestion
 		void			transitionImageLayout(VkImage image, VkFormat format,
 							VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels);
 		void			copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-		void			createTextureImage();
+		void			createTextureImage(Texture2D texture);
 		void			endSingleTimeCommands(VkCommandBuffer commandBuffer);
 		VkCommandBuffer	beginSingleTimeCommands();
 
@@ -415,7 +410,7 @@ class ProgramGestion
 	//												Model										    		//
 	//******************************************************************************************************//
 
-		void		loadModel();
+		void		loadModel(Obj mesh);
 
 	//******************************************************************************************************//
 	//												Minimaps									    		//
@@ -435,8 +430,13 @@ class ProgramGestion
 	//												Others										    		//
 	//******************************************************************************************************//
 
-		std::vector<char> readFile(const std::string &filename);
-		float		deltaTime(void);
+		std::vector<char>	readFile(const std::string &filename);
+		float				deltaTime(void);
+
+	public:
+		void 	changeTexture(Texture2D	texture);
+		void	chooseTexture();
+		void	changeMesh(Obj mesh);
 	
 	//******************************************************************************************************//
 	//												Variables									    		//
@@ -472,14 +472,14 @@ class ProgramGestion
 		
 		uint							_space = 0;
 
-		std::string MODEL_PATH;
-		std::string TEXTURE_PATH;
-
-		std::string MODEL_PATH_DROP;
-		std::string TEXTURE_PATH_DROP;
+		// Texture2D						_defaultTexture;
 
 		std::vector<Texture2D>	_textures;
 		std::vector<Obj> 		_obj;
+		bool					_texture = false;
+		int						_textureIndex = 0;
+		int						_objIndex = 0;
+		bool					_thread = true;
 	
 	// Private Attributes //
 	private:
@@ -555,6 +555,7 @@ class ProgramGestion
 
 void	key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void	mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void	cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void	scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void	drop_callback(GLFWwindow* window, int count, const char** paths);
 void	resetTransform(void);

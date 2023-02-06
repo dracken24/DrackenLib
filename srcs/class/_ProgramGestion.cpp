@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:20:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/04 22:29:25 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/05 22:07:32 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,8 @@ void ProgramGestion::cleanup()
 
 	glfwTerminate();
 	std::cout << GREEN << '\n' <<  "Vulkan resources cleaned up, success" << RESET << std::endl << std::endl;
+
+	exit(EXIT_SUCCESS);
 }
 
 //******************************************************************************************************//
@@ -179,10 +181,10 @@ void ProgramGestion::initWindow(std::string name)
 void ProgramGestion::initVulkan()
 {
 	createInstance(); // Create Vulkan instance //
-	setupDebugMessenger();
+	setupDebugMessenger();	// Create debug messenger //
 	createSurface();	  // Create surface for communication with selected GPU //
 	pickPhysicalDevice(); // Select GPU //
-	createLogicalDevice();
+	createLogicalDevice();	
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
@@ -192,10 +194,10 @@ void ProgramGestion::initVulkan()
 	createColorResources();
 	createDepthResources();
 	createFramebuffers();
-	createTextureImage();
+	createTextureImage(_textures.at(_textureIndex));
 	createTextureImageView();
 	createTextureSampler();
-	loadModel();
+	loadModel(_obj.at(_objIndex));
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -260,7 +262,7 @@ float	ProgramGestion::deltaTime(void)
 	return (deltaTime);
 }
 
-ProgramGestion::Vector2	ProgramGestion::getImgSize(const char *path)
+Vector2	ProgramGestion::getImgSize(const char *path)
 {
     int width;
     int height;
@@ -1764,14 +1766,16 @@ void	ProgramGestion::createDescriptorSets()
 //											Texture mapping									    		//
 //******************************************************************************************************//
  
-void	ProgramGestion::createTextureImage()
+void	ProgramGestion::createTextureImage(Texture2D texture)
 {
 	// Load the image //
 	int texWidth, texHeight, texChannels;
     // stbi_uc* 		pixels = stbi_load("srcs/textures/ichigo.png", &texWidth, &texHeight,
 	// 							&texChannels, STBI_rgb_alpha);
-	stbi_uc	*pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight,
-						&texChannels, STBI_rgb_alpha);
+	texWidth = static_cast<int>(texture.imgSize.x);
+	texHeight = static_cast<int>(texture.imgSize.y);
+	
+	stbi_uc	*pixels = stbi_load(texture.imgPath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
     VkDeviceSize	imageSize = texWidth * texHeight * 4;
 	mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
 
@@ -2113,14 +2117,14 @@ bool	ProgramGestion::hasStencilComponent(VkFormat format)
 //******************************************************************************************************//
 
 // Load the model //
-void	ProgramGestion::loadModel()
+void	ProgramGestion::loadModel(Obj mesh)
 {	
 	tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str()))
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, mesh.objPath.c_str()))
 	{
         throw std::runtime_error(warn + err);
     }
