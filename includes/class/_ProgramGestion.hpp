@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 21:53:06 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/05 21:52:16 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/08 00:14:08 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,8 @@ typedef struct  Obj
 {
 	std::string		objPath;
 	std::string		objName;
+
+	Vector3			objSize;
 }               Obj;
 
 typedef struct		Rotate
@@ -435,8 +437,12 @@ class ProgramGestion
 
 	public:
 		void 	changeTexture(Texture2D	texture);
-		void	chooseTexture();
+		int		chooseTexture();
 		void	changeMesh(Obj mesh);
+		Vector3 getObjSize(const char *path);
+		float	getMaxObjSize(Obj mesh);
+		void	choice();
+		int		chooseObj();
 	
 	//******************************************************************************************************//
 	//												Variables									    		//
@@ -474,12 +480,18 @@ class ProgramGestion
 
 		// Texture2D						_defaultTexture;
 
+		VkPolygonMode					_modeFil = VK_POLYGON_MODE_FILL;
+
 		std::vector<Texture2D>	_textures;
 		std::vector<Obj> 		_obj;
+		
 		bool					_texture = false;
-		int						_textureIndex = 0;
-		int						_objIndex = 0;
+		bool					_mesh = false;
+		uint					_textureIndex = 0;
+		uint					_objIndex = 0;
 		bool					_thread = true;
+		float					_far = 2.0f;
+		float					_zoomModifier = 0;
 	
 	// Private Attributes //
 	private:

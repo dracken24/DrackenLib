@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 15:27:53 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/05 15:28:58 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/08 00:15:56 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,17 @@ void	resetTransform(void)
 	app._translate.x = 0.0f;
 	app._translate.y = 0.0f;
 	app._translate.z = 0.0f;
+	
 	app._rotate.x = 0.0f;
 	app._rotate.y = 0.0f;
 	app._rotate.z = 0.0f;
 
-	app._scale.x = 1.0f;
-	app._scale.y = 1.0f;
-	app._scale.z = 1.0f;
+	Vector3 tmp = app.getObjSize(app._obj.at(app._objIndex).objPath.c_str());
+	
+	app._scale.x = app._far;
+	app._scale.y = app._far;
+	app._scale.z = app._far;
+	app._zoomModifier = app._far / 10;
 }
 
 void	onKeyPress(void)
@@ -141,10 +145,22 @@ void	key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 				app._right = 0;
 			break;
 
+		// case GLFW_KEY_1:
+		// 	if (action == GLFW_PRESS)
+		// 		app._modeFil = VK_POLYGON_MODE_FILL;
+		// 	break;
+		// case GLFW_KEY_2:
+		// 	if (action == GLFW_PRESS)
+		// 		app._modeFil = VK_POLYGON_MODE_LINE;
+		// 	break;
+
 		// Reset //
 		case GLFW_KEY_SPACE:
 			if (action == GLFW_PRESS)
+			{
+				std::cout << "Reset" << std::endl;
 				app._space = 1;
+			}
 			else if (action == GLFW_RELEASE)
 				app._space = 0;
 			break;
@@ -194,15 +210,15 @@ void	scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 	if (yoffset == 1)
 	{
-		app._scale.x += 0.1f;
-		app._scale.y += 0.1f;
-		app._scale.z += 0.1f;
+		app._scale.x -= app._zoomModifier;
+		app._scale.y -= app._zoomModifier;
+		app._scale.z -= app._zoomModifier;
 	}
 	else if (yoffset == -1)
 	{
-		app._scale.x -= 0.1f;
-		app._scale.y -= 0.1f;
-		app._scale.z -= 0.1f;
+		app._scale.x += app._zoomModifier;
+		app._scale.y += app._zoomModifier;
+		app._scale.z += app._zoomModifier;
 	}
 }
 

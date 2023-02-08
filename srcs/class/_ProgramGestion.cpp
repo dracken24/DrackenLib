@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:20:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/05 22:07:32 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/08 00:10:57 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,10 +256,63 @@ float	ProgramGestion::deltaTime(void)
 	float			currentFrame = glfwGetTime();
 	float			deltaTime = currentFrame - lastFrame;
 	
-	app.setDeltaTime(deltaTime, 1);
+	setDeltaTime(deltaTime, 1);
 	lastFrame = currentFrame;
 	
 	return (deltaTime);
+}
+
+float	ProgramGestion::getMaxObjSize(Obj mesh)
+{
+	// Obj		obj = _obj.at(index);
+
+	if (mesh.objSize.x > mesh.objSize.y && mesh.objSize.x > mesh.objSize.z)
+		return (mesh.objSize.x);
+	else if (mesh.objSize.y > mesh.objSize.x && mesh.objSize.y > mesh.objSize.z)
+		return (mesh.objSize.y);
+	else
+		return (mesh.objSize.z);
+}
+
+
+Vector3 ProgramGestion::getObjSize(const char *path)
+{
+    Vector3 minVertex = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
+    Vector3 maxVertex = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };
+    
+    std::ifstream file(path);
+    if (file.is_open())
+    {
+        std::string line;
+        while (std::getline(file, line))
+        {
+            if (line.empty() || line[0] == '#')
+                continue;
+            
+            float x, y, z;
+            if (sscanf(line.c_str(), "v %f %f %f", &x, &y, &z) == 3)
+            {
+                minVertex.x = std::min(minVertex.x, x);
+                minVertex.y = std::min(minVertex.y, y);
+                minVertex.z = std::min(minVertex.z, z);
+                
+                maxVertex.x = std::max(maxVertex.x, x);
+                maxVertex.y = std::max(maxVertex.y, y);
+                maxVertex.z = std::max(maxVertex.z, z);
+            }
+        }
+    }
+    else
+    {
+        std::cerr << "Failed to open file: " << path << std::endl;
+    }
+    
+    Vector3 size;
+    size.x = maxVertex.x - minVertex.x;
+    size.y = maxVertex.y - minVertex.y;
+    size.z = maxVertex.z - minVertex.z;
+    
+    return size;
 }
 
 Vector2	ProgramGestion::getImgSize(const char *path)
@@ -431,6 +484,7 @@ bool ProgramGestion::checkDeviceExtensionSupport(VkPhysicalDevice device)
 	// Check if the extension is supported //
 	for (const auto &extension : availableExtensions)
 	{
+		// std::cout << "Extension supported : " << extension.extensionName << std::endl;
 		requiredExtensions.erase(extension.extensionName);
 	}
 
@@ -1003,7 +1057,7 @@ void ProgramGestion::createGraphicsPipeline(void)
 	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;	// Create the rasterizer //
 	rasterizer.depthClampEnable = VK_FALSE;											// Disable the depth clamp //
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;									// Disable the rasterizer discard //
-	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;									// Set the polygon mode //
+	rasterizer.polygonMode = _modeFil;												// Set the polygon mode //
 	rasterizer.lineWidth = 1.0f;													// Set the line width //
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;									// Set the cull mode //
 	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;							// Set the front face //
@@ -1673,12 +1727,11 @@ void ProgramGestion::updateUniformBuffer(uint32_t currentImage)
 	ubo.model = glm::rotate(ubo.model, glm::radians(_rotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.model = glm::rotate(ubo.model, glm::radians(_rotate.x), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	
 	ubo.model = glm::translate(ubo.model, glm::vec3(_translate.x, _translate.y, _translate.z));
-	ubo.model = glm::scale(ubo.model, glm::vec3(_scale.x, _scale.y, _scale.z));
+	// ubo.model = glm::scale(ubo.model, glm::vec3(_scale.x, _scale.y, _scale.z));
 	
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+	ubo.view = glm::lookAt(glm::vec3(_scale.x, _scale.y, _scale.z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.01f, 5000.0f);
 	ubo.proj[1][1] *= -1;
 
 	memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
