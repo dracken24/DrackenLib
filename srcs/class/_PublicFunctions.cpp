@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/04 17:55:55 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/08 00:20:14 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/02/13 19:35:32 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	ProgramGestion::initVariables(int argc, char **argv)
 			std::cout << RED << "Error: File type not supported: " << argv[it] << RESET << std::endl;
 	}
 
-	_far = app.getMaxObjSize(app._obj.at(0)) * 1.2f;
+	_far = app.getMaxObjSize(app._obj.at(0)) * 1.6f;
 	_scale.x = _far;
 	_scale.y = _far;
 	_scale.z = _far;
@@ -121,8 +121,16 @@ void	drop_callback(GLFWwindow* window, int count, const char** paths)
 				app._scale.y = app._far;
 				app._scale.z = app._far;
 				app._zoomModifier = app._far / 10;
-				app.changeMesh(app._obj.at(app._obj.size() - 1));
 				app._objIndex = app._obj.size() - 1;
+
+				app._translate.x = 0.0f;
+				app._translate.y = 0.0f;
+				app._translate.z = 0.0f;
+				app._rotate.x = 0.0f;
+				app._rotate.y = 0.0f;
+				app._rotate.z = 0.0f;
+
+				app.changeMesh(app._obj.at(app._obj.size() - 1));
 			}
 		}
 		else if (strcmp(strrchr(paths[it], '.'), ".png") == 0 || strcmp(strrchr(paths[it], '.'), ".jpg") == 0)
@@ -144,10 +152,6 @@ void	drop_callback(GLFWwindow* window, int count, const char** paths)
 
 	listAll();
 	
-	// for (int i = 0; i < app._textures.size(); i++)
-	// {
-	// 	std::cout << GREEN << "Texture [" << i << "] : " << app._textures[i].imgName << RESET << std::endl;
-	// }
 	std::cout << "Choose Mesh or Texture" << std::endl;
 		std::cout << "1 - Texture" << std::endl;
 		std::cout << "2 - Mesh" << std::endl;
@@ -327,5 +331,12 @@ void	ProgramGestion::changeMesh(Obj mesh)
 	app._scale.y = app._far;
 	app._scale.z = app._far;
 	app._zoomModifier = app._far / 10;
-	// app._objIndex = app._obj.size() - 1;
+
+	app._translate.x = 0.0f;
+	app._translate.y = 0.0f;
+	app._translate.z = 0.0f;
+	app._rotate.x = 0.0f;
+	app._rotate.y = 0.0f;
+	app._rotate.z = 0.0f;
+	app._objIndex = app._obj.size() - 1;
 }
