@@ -1,8 +1,8 @@
 # Vulkan_Template
 
-![1](https://github.com/dracken24/DrackenLib_Vulkan_Project/blob/main/puit.mp4)
+![1](https://github.com/dracken24/DrackenLib_Vulkan_Project/blob/main/puit.gif)
 
-![2](https://github.com/dracken24/DrackenLib_Vulkan_Project/blob/main/Untitled.gif)
+![2](https://github.com/dracken24/DrackenLib_Vulkan_Project/blob/main/sniper.gif)
 
 -Les objets Vulkan sont soit créés directement avec des fonctions comme vkCreateXXX,
     soit alloués via un autre objet avec des fonctions comme vkAllocateXXX.
