@@ -4,7 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/dracken24/Documents/myPackages/vcpkg/installed/x64-linux/include/GLES"
+                "/home/dracken24/Documents/prog/DrackenLib/includes",
+                "/usr/include/c++/11",
+                "/usr/include/x86_64-linux-gnu/c++/11",
+                "/home/dracken24/Documents/vcpkg/buildtrees/tinyobjloader/src/v2.0.0rc9-5c2f952032.clean"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
