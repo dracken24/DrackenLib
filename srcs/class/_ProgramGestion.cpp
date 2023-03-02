@@ -6,16 +6,16 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:20:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/24 13:39:31 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/03/02 12:48:58 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../../stb/stb_image.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "../../tiny_obj_loader.h"
 
-#include "../../includes/class/_ProgramGestion.hpp"
+#include "../includes/class/_ProgramGestion.hpp"
 // #include "../../includes/engine.hpp"
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL	debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

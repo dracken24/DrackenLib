@@ -6,11 +6,11 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/05 15:27:53 by dracken24         #+#    #+#             */
-/*   Updated: 2023/02/08 00:15:56 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/03/02 12:27:42 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/class/_ProgramGestion.hpp"
+#include "includes/class/_ProgramGestion.hpp"
 
 extern ProgramGestion app;
 
