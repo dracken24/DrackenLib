@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 22:20:08 by dracken24         #+#    #+#             */
-/*   Updated: 2023/03/02 12:48:58 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/03/22 11:18:06 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ void ProgramGestion::init(std::string name)
 {
 	initWindow(name);
 	initVulkan();
+	std::cout << "\e[1;1H\e[2J" << MAGENTA;
 	// mainLoop();
 	// cleanup();
 }

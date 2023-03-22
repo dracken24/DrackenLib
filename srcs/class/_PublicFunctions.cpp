@@ -6,7 +6,7 @@
 /*   By: dracken24 <dracken24@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/04 17:55:55 by dracken24         #+#    #+#             */
-/*   Updated: 2023/03/02 12:27:38 by dracken24        ###   ########.fr       */
+/*   Updated: 2023/03/22 11:14:57 by dracken24        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	ProgramGestion::initVariables(int argc, char **argv)
 	app._rotate.y = 0.0f;
 	app._rotate.z = 0.0f;
 
-	for (int it = 0; it < argc; it++)
+	for (int it = 1; it < argc; it++)
 	{
 		if (strcmp(strrchr(argv[it], '.'), ".obj") == 0)
 		{
